@@ -1,0 +1,188 @@
+FORMAT: 1A
+HOST: https://testapi.samesystem.com/api/v1
+
+# SameSystem API v1
+
+Welcome to SameSystem public API documentation.
+
+In case of any questions, please feel free to contact <api@samesystem.com>
+
+**Important notes**
+
+* All communications are available through JSON, so please pass the correct content-type header or append .json to each URL to API call. 
+* All numbers are passed and returned in floating point number format "%g", for example 123.12. Localized number formatting is not allowed!
+* All dates are passed and returned in international date format: YYYY-MM-DD, for example 2013-12-01.
+* In request URL always reference correct ctx_token where needed.
+
+**What is {ctx_token} and how to use it**
+
+* Context token is a "c\d+d\d+" formatted string, that refers which department information you're trying to reach. Example: c1d10.
+* Your context token is not available via API for security reasons, please copy-paste it from SameSystem. It is in URL address when you're logged in, right after domain, for example "https://in.samesystem.com/c1d10/..."
+
+
+**Request status**
+
+* Each time request is made, API always respons with exact content or `status` node. If `status` contents equals to `fail`, then `description` node is specified also. 
+
+**Permissions**
+
+* If API call is made where current user doesn't have access in Samesystem, request will fail with HTTP status of 401 (not allowed), and `status` of "unauthorized"
+
+**Database version on test server**
+
+_2015-10-19_
+
+
+# Group Authorization and authentication
+
+To use SameSystem API, please create a new user using SameSystem's web interface and check "For API usage". Grant all necessary permissions for this particular user to accomplish
+given tasks, because API permissions works exactly the same as permissions in web based SameSystem.
+
+## Login [/login]
+
+Login to get token for API authentication. Received token should be encoded to HTTP_AUTHORIZATION header as token for all further API requests. 
+**Token is valid for 10 minutes.** After this amount of time, please re-login to gain new token.
+
+### Login to the system [POST]
++ Request
+    + Headers
+        
+            Content-Type: 'application/json'
+    + Body
+        
+            {
+                "email": "john.doe@mail.dk",
+                "password": "apitestingpwd"
+            }
++ Response 201 (application/json)
+
+        {
+            "status": "ok",
+            "token": "7NV1ycL2DxSXjH9OEvRlxg"
+        }
+
+## Logout [/logout]
+
+Logout to invalidate your token. This action must be called after all calls to API has been finished (and you consider your security as seriously as we do).
+
+### Logout [POST]
++ Request
+    + Headers
+        
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+    + Body
+        
+            {}
++ Response 200 (application/json)
+
+        {
+            "status": "ok"
+        }
+
+# Group Departments
+
+Group of all department-related resources.
+
+## List departments [/departments]
+
+Perform a GET request to get full list of available departments for your account with corresponding `ctx_token`. Please keep in mind, that for the same department `ctx_token` never changes, however, name can be changed by your administrator.
+
+### Get list of departments [GET]
++ Request
+    + Headers
+    
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
++ Response 200 (application/json)
+
+        {
+            "departments": [
+                { "name": "Shoes", "ctx_token": "c1205d5258", "dpt_no": "1" },
+                { "name": "T-Shirts", "ctx_token": "c1205d6595", "dpt_no": null }
+            ]
+        }
+        
+## Create department [/departments/create]
+    
+Create a department on SameSystem. You can send the attributes that are exposed here in the example below. Choose appropriate programing language from menu "Show code sample" to see details.
+'name' and 'email' nodes are must be set. For manager email use 'manager_email' node. If you don't provide manager's email, then manager's email will be set for the user which is used for this API call.
+
+### Create a new department [POST]
++ Request
+    + Headers
+        
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+    + Body
+        
+            {
+                "name": "Your Shop", 
+                "email": "shops_email@inside.dk",
+                "manager_email": "manager_email@inside.dk",
+                "phone": "0123345667",
+                "dpt_nr": "324",
+                "abbr": "department abbriviation",
+                "salary_dpt_nr": "12",
+                "salary_dpt_nr2": "13",
+                "address": "Same Str. 1",
+                "fax": "0033389993",
+                "postal_code": "2344",
+                "city": "City",
+                "inactive": "false",
+                "non_lendable": "false"
+            }
++ Response 200 (application/json)
+
+        {
+            "status": "ok", 
+            "description": "Department has been successfully created",
+            "department_id": 100
+        }
+
+## Update department [/departments/update/{department_id}]
+Update a department on SameSystem. You can send the same attributes as described in create department API call except that nodes are free of choice.
+For manager's email use 'manager_email' node.
+
++ Parameters
+
+    + department_id (required, number) - ID of the department
+
+
+
+
+### Update a department [POST]
++ Request
+    + Headers
+        
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+    + Body
+        
+            {
+                "name": "Your updated Shop", 
+                "email": "shops_email@inside.dk",
+                "manager_email": "manager_email@inside.dk",
+                "phone": "0123345667",
+                "dpt_nr": "324",
+                "abbr": "department abbriviation",
+                "salary_dpt_nr": "12",
+                "salary_dpt_nr2": "13",
+                "address": "Same Str. 1",
+                "fax": "0033389993",
+                "postal_code": "2344",
+                "city": "City",
+                "inactive": "false",
+                "non_lendable": "false"
+            }
++ Response 200 (application/json)
+
+        {
+            "status": "ok", 
+            "description": "Shop #11 has been successfully updated"
+        }
+
+# Group Weekly balance
+Weekly balance is used for daily accounting. Multiple cash registers can be used in shop, in this case "register_count" variable returns count of cash registers in the department.
+
+## List fields [/{ctx_token}/weekly_balance/fields]
