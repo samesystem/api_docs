@@ -1,36 +1,38 @@
 FORMAT: 1A
 HOST: https://testapi.samesystem.com/api/v1
 
-# SameSystem API v1 Testing Server
+# SameSystem API v1 (Test Server)
+
+* This *documentation* uses **testapi** server on console when trying requests! Rest are the same as on the main documentation located under https://docs.samesystem.apiary.io
 
 Welcome to SameSystem public API documentation.
 
 In case of any questions, please feel free to contact <api@samesystem.com>
 
-**Important notes**
+### Important notes
 
-* All communications are available through JSON, so please pass the correct content-type header or append .json to each URL to API call.
-* All numbers are passed and returned in floating point number format "%g", for example 123.12. Localized number formatting is not allowed!
-* All dates are passed and returned in international date format: YYYY-MM-DD, for example 2013-12-01.
-* In request URL always reference correct ctx_token where needed.
+* All *communications* are available through JSON, so please pass the correct content-type header or append .json to each URL to API call.
+* All *numbers* are passed and returned in floating point number format "%g", for example 123.12. Localized number formatting is not allowed!
+* All *dates* are passed and returned in international date format: YYYY-MM-DD, for example 2013-12-01.
+* In request URL always reference correct *ctx_token* where needed.
 
-**What is {ctx_token} and how to use it**
+### What is {ctx_token} and how to use it
 
 * Context token is a "c\d+d\d+" formatted string, that refers which department information you're trying to reach. Example: c1d10.
 * Your context token is not available via API for security reasons, please copy-paste it from SameSystem. It is in URL address when you're logged in, right after domain, for example "https://in.samesystem.com/c1d10/..."
 
 
-**Request status**
+### Request status
 
 * Each time request is made, API always respons with exact content or `status` node. If `status` contents equals to `fail`, then `description` node is specified also.
 
-**Permissions**
+### Permissions
 
 * If API call is made where current user doesn't have access in Samesystem, request will fail with HTTP status of 401 (not allowed), and `status` of "unauthorized"
 
-**Database version on test server**
+### Database version on test server
 
-_2015-10-19_
+* **2015-10-19**
 
 
 # Group Authorization and authentication
@@ -85,7 +87,6 @@ Logout to invalidate your token. This action must be called after all calls to A
 Group of all department-related resources.
 
 ## List departments [/departments]
-
 Perform a GET request to get full list of available departments for your account with corresponding `ctx_token`. Please keep in mind, that for the same department `ctx_token` never changes, however, name can be changed by your administrator.
 
 ### Get list of departments [GET]
@@ -104,7 +105,6 @@ Perform a GET request to get full list of available departments for your account
         }
 
 ## Create department [/departments/create]
-
 Create a department on SameSystem. You can send the attributes that are exposed here in the example below. Choose appropriate programing language from menu "Show code sample" to see details.
 'name' and 'email' nodes are must be set. For manager email use 'manager_email' node. If you don't provide manager's email, then manager's email will be set for the user which is used for this API call.
 
@@ -148,9 +148,6 @@ For manager's email use 'manager_email' node.
 
     + department_id (required, number) - ID of the department
 
-
-
-
 ### Update a department [POST]
 + Request
     + Headers
@@ -189,542 +186,857 @@ Weekly balance is used for daily accounting. Multiple cash registers can be used
 Get all weekly balance fields. Field ids must be referenced on saving request.
 Explanations for some attributes:
 
-* field_type - number/text/expense/deposit. Number, expense and deposit type of field a is Float,
-text is a String. Expense and deposit are special kind of fields which must be detailed
-with exact entries when saving.
-* summable - if false, numbers mathematically cannot be summed up for total.
-* calculated - if true, this field is calculated from other fields, therefore there's no need
-to submit this with `save` request.
-* mandatory - if true, this field must be present before confirming the day. The only exception is when
-all fields are empty in given date (closed day situation).
-GET /{ctx_token}/weekly_balance/fields
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "fields": [
-  { "field_id": 1, "name": "Sales", "field_type": "number", "summable": true,
-    "code": "A1", "calculated": false, "mandatory": true },
-  { "field_id": 2, "name": "Sales (without VAT)", "field_type": "number", "summable": true,
-    "code": "A1.1", "calculated": true, "mandatory": false },
-  { "field_id": 3, "name": "Returned items", "field_type": "number", "summable": true,
-    "code": "A2", "calculated": false, "mandatory": false },
-  { "field_id": 4, "name": "Bank person", "field_type": "text", "summable": false,
-    "code": "A3", "calculated": false, "mandatory": true },
-  { "field_id": 5, "name": "Expenses", "field_type": "expense", "summable": true,
-    "code": "B1", "calculated": false, "mandatory": false },
-  { "field_id": 6, "name": "Transfered to bank", "field_type": "number", "summable": true,
-    "code":  null, "calculated": false, "mandatory": true },
-  { "field_id": 7, "name": "Difference", "field_type": "number", "summable": true,
-    "code": null, "calculated": true, "mandatory": false }
- ],
- "expense_groups": [
-   { "group_id": 1, "name": "Local expenses" },
-   { "group_id": 2, "name": "Outsource" }
- ],
- "deposit_groups": []
-}
+| Attribute | Explanation |
+|-----------|-------------|
+| field_type | `number/text/expense/deposit` -  number, expense and deposit type of field a is *Float*, text is a *String*. Expense and deposit are special kind of fields which must be detailed with exact entries when saving. |
+| summable | If `false`, numbers mathematically cannot be summed up for total. |
+| calculated | If `true`, this field is calculated from other fields, therefore there's no need to submit this with `save` request. |
+| mandatory | If `true`, this field must be present before confirming the day. The only exception is when all fields are empty in given date (closed day situation). |
 
-Get all numbers, comments and confirmation information for the specified week.
-**Register count can be different for each week**.
-GET /{ctx_token}/weekly_balance/{date}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-{ "register_count": 2,
-  "registers": [
-    { "register_number": 1,
-      "week_approved": false,
-      "unavailable_fields": [],
-      "confirmed": {
-        "2013-07-01": { "datetime": "2013-07-01 21:00:00", "user": "Adriana Laursen" },
-        "2013-07-02": { "datetime": "2013-07-02 20:30:00", "user": "Adriana Laursen" }
-      },
-      "comments": {
-        "2013-07-01": "All good, sir",
-        "2013-07-02": "All good, sir"
-      },
-      "lines": {
-        "2013-07-01": [
-          { "field_id":  1, "value": 10000.0   },
-          { "field_id":  2, "value": 8000.0    },
-          { "field_id":  3, "value": 3         },
-          { "field_id":  5, "value": 200.0     },
-          { "field_id":  6, "value": 10002.0   },
-          { "field_id":  7, "value": -2.0      },
-          { "field_id":  4, "value": "Adriana" }
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### List all fields [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "fields": [
+          { "field_id": 1, "name": "Sales", "field_type": "number", "summable": true,
+            "code": "A1", "calculated": false, "mandatory": true },
+          { "field_id": 2, "name": "Sales (without VAT)", "field_type": "number", "summable": true,
+            "code": "A1.1", "calculated": true, "mandatory": false },
+          { "field_id": 3, "name": "Returned items", "field_type": "number", "summable": true,
+            "code": "A2", "calculated": false, "mandatory": false },
+          { "field_id": 4, "name": "Bank person", "field_type": "text", "summable": false,
+            "code": "A3", "calculated": false, "mandatory": true },
+          { "field_id": 5, "name": "Expenses", "field_type": "expense", "summable": true,
+            "code": "B1", "calculated": false, "mandatory": false },
+          { "field_id": 6, "name": "Transfered to bank", "field_type": "number", "summable": true,
+            "code":  null, "calculated": false, "mandatory": true },
+          { "field_id": 7, "name": "Difference", "field_type": "number", "summable": true,
+            "code": null, "calculated": true, "mandatory": false }
+         ],
+        "expense_groups": [
+          { "group_id": 1, "name": "Local expenses" },
+          { "group_id": 2, "name": "Outsource" }
         ],
-        "2013-07-02": [
-          { "field_id":  1, "value": 12000.0   },
-          { "field_id":  2, "value": 9600.0    },
-          { "field_id":  3, "value": 1         },
-          { "field_id":  5, "value": 0.0       },
-          { "field_id":  6, "value": 11990.0   },
-          { "field_id":  7, "value": 10.0      },
-          { "field_id":  4, "value": "Adriana" }
-        ]
-      },
-      "expenses": {
-        "2013-07-01": [
-          { "group_id": 1, "title": "Printing paper", "value": 150.0 },
-          { "group_id": 2, "title": "Fuel", "value": 50.0 }
-        ]
-      },
-      "deposits": {}
-    },
-    { "register_number": 2,
-      "week_approved": false,
-      "unavailable_fields": [3],
-      "confirmed": {
-        "2013-07-01": { "datetime": "2013-07-01 21:01:00", "user": "Adriana Laursen" },
-        "2013-07-02": { "datetime": "2013-07-02 20:31:00", "user": "Adriana Laursen" }
-      },
-      "comments": {
-        "2013-07-01": "All good, sir",
-        "2013-07-02": "All good"
-      },
-      "lines": {
-        "2013-07-01": [
-          { "field_id": 1, "value": 1000.0    },
-          { "field_id": 2, "value": 800.0     },
-          { "field_id": 5, "value": 0.0       },
-          { "field_id": 6, "value": 1000.5    },
-          { "field_id": 7, "value": -0.5      },
-          { "field_id": 4, "value": "Adriana" }
-        ],
-        "2013-07-02": [
-          { "field_id": 1, "value": 1200.0    },
-          { "field_id": 2, "value": 960.0     },
-          { "field_id": 5, "value": 0.0       },
-          { "field_id": 6, "value": 1199.0    },
-          { "field_id": 7, "value": 1.0       },
-          { "field_id": 4, "value": "John"    }
-        ]
-      },
-      "expenses": {},
-      "deposits": {}
+        "deposit_groups": []
     }
-  ]
-}
+## Getting numbers [/{ctx_token}/weekly_balance/{date}]
+Get all numbers, comments and confirmation information for the specified week. **Register count can be different for each week**.
 
-Save daily numbers. Expenses/deposits must be referenced with correct groups. **Please note that
-you must confirm the day for ALL REGISTERS after saving all numbers**, otherwise these numbers won't be used for any
-other calculations in the system! Please check the next action how to do it.
-POST /{ctx_token}/weekly_balance/save/{date}/{register_number}
-> Content-Type: application/json
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-{ "comments": "No issues today",
-  "lines": [
-    { "field_id": 1, "value": 100.0 },
-    { "field_id": 2, "value": 80.0  },
-    { "field_id": 3, "value": 1     },
-    { "field_id": 5, "value": 20.0  },
-    { "field_id": 6, "value": 99.9  },
-    { "field_id": 7, "value": 0.1   },
-    { "field_id": 4, "value": "Josh" }
-  ],
-  "expenses": [
-    { "group_id": 1, "title": "Towels",  "value": 2.0  },
-    { "group_id": 2, "title": "Tickets", "value": 18.0 }
-  ],
-  "deposits": []
-}
-< 201
-< Content-Type: application/json
-{ "status": "ok", "description": "Weekly balance numbers for 2013-07-03 register #1 has been saved." }
++ Parameters
 
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
 
+### Get all weekly balance numbers [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "register_count": 2,
+        "registers": [
+            { "register_number": 1,
+              "week_approved": false,
+              "unavailable_fields": [],
+              "confirmed": {
+                "2013-07-01": { "datetime": "2013-07-01 21:00:00", "user": "Adriana Laursen" },
+                "2013-07-02": { "datetime": "2013-07-02 20:30:00", "user": "Adriana Laursen" }
+              },
+              "comments": {
+                "2013-07-01": "All good, sir",
+                "2013-07-02": "All good, sir"
+              },
+              "lines": {
+                "2013-07-01": [
+                  { "field_id":  1, "value": 10000.0   },
+                  { "field_id":  2, "value": 8000.0    },
+                  { "field_id":  3, "value": 3         },
+                  { "field_id":  5, "value": 200.0     },
+                  { "field_id":  6, "value": 10002.0   },
+                  { "field_id":  7, "value": -2.0      },
+                  { "field_id":  4, "value": "Adriana" }
+                ],
+                "2013-07-02": [
+                  { "field_id":  1, "value": 12000.0   },
+                  { "field_id":  2, "value": 9600.0    },
+                  { "field_id":  3, "value": 1         },
+                  { "field_id":  5, "value": 0.0       },
+                  { "field_id":  6, "value": 11990.0   },
+                  { "field_id":  7, "value": 10.0      },
+                  { "field_id":  4, "value": "Adriana" }
+                ]
+              },
+              "expenses": {
+                "2013-07-01": [
+                  { "group_id": 1, "title": "Printing paper", "value": 150.0 },
+                  { "group_id": 2, "title": "Fuel", "value": 50.0 }
+                ]
+              },
+              "deposits": {}
+            },
+            { "register_number": 2,
+              "week_approved": false,
+              "unavailable_fields": [3],
+              "confirmed": {
+                "2013-07-01": { "datetime": "2013-07-01 21:01:00", "user": "Adriana Laursen" },
+                "2013-07-02": { "datetime": "2013-07-02 20:31:00", "user": "Adriana Laursen" }
+              },
+              "comments": {
+                "2013-07-01": "All good, sir",
+                "2013-07-02": "All good"
+              },
+              "lines": {
+                "2013-07-01": [
+                  { "field_id": 1, "value": 1000.0    },
+                  { "field_id": 2, "value": 800.0     },
+                  { "field_id": 5, "value": 0.0       },
+                  { "field_id": 6, "value": 1000.5    },
+                  { "field_id": 7, "value": -0.5      },
+                  { "field_id": 4, "value": "Adriana" }
+                ],
+                "2013-07-02": [
+                  { "field_id": 1, "value": 1200.0    },
+                  { "field_id": 2, "value": 960.0     },
+                  { "field_id": 5, "value": 0.0       },
+                  { "field_id": 6, "value": 1199.0    },
+                  { "field_id": 7, "value": 1.0       },
+                  { "field_id": 4, "value": "John"    }
+                ]
+              },
+              "expenses": {},
+              "deposits": {}
+            }
+        ]
+    }
+
+## Saving Numbers [/{ctx_token}/weekly_balance/save/{date}/{register_number}]
+Save daily numbers. Expenses/deposits must be referenced with correct groups. **Please note that you must confirm the day for ALL REGISTERS after saving all numbers**, otherwise these numbers won't be used for any other calculations in the system! Please check the next action how to do it.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + register_number (required, number) - Number of the register; for details ask your administrator
+
+### Save daily Numbers [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+            { "comments": "No issues today",
+                "lines": [
+                  { "field_id": 1, "value": 100.0 },
+                  { "field_id": 2, "value": 80.0  },
+                  { "field_id": 3, "value": 1     },
+                  { "field_id": 5, "value": 20.0  },
+                  { "field_id": 6, "value": 99.9  },
+                  { "field_id": 7, "value": 0.1   },
+                  { "field_id": 4, "value": "Josh" }
+                ],
+                "expenses": [
+                  { "group_id": 1, "title": "Towels",  "value": 2.0  },
+                  { "group_id": 2, "title": "Tickets", "value": 18.0 }
+                ],
+                "deposits": []
+            }
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+        "description": "Weekly balance numbers for 2013-07-03 register #1 has been saved."
+    }
+
+## Confirming Numbers [/{ctx_token}/weekly_balance/confirm/{date}/{register_number}]
 Confirm daily numbers. Confirming for specified date might fail if:
 
 * mandatory field is not present
 * comment must be filled in on balance overrun, overrun is detected but no comment is present
 
-In both cases, exact fail reason will be specified in `description` node and HTTP status will be 412 (precondition failed).
+In both cases, exact fail reason will be specified in `description` node and HTTP status will be `412 (precondition failed)`.
 
-POST /{ctx_token}/weekly_balance/confirm/{date}/{register_number}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "status": "ok" }
++ Parameters
 
-Unconfirm the day in weekly balance. You need to do this if you need to correct numbers
-for already confirmed day. Please note that a separate permission for unapproving the day
-is necessary.
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + register_number (required, number) - Number of the register; for details ask your administrator
 
-POST /{ctx_token}/weekly_balance/unconfirm/{date}/{register_number}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "status": "ok" }
+### Confirm daily Numbers [POST]
++ Request
+    + Headers
 
-Approve whole weekly balance report. Confirming for specified week might fail if some days
-in this week are not confirmed. Exact fail reason will be specified in `description` node.
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
 
-POST /{ctx_token}/weekly_balance/approve_week/{date}/{register_number}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "status": "ok" }
++ Response 200 (application/json)
 
-Unapprove whole weekly balance report. Please note that this action requires additional permissions
-to do that.
+    {
+        "status": "ok",
+    }
 
-POST /{ctx_token}/weekly_balance/unapprove_week/{date}/{register_number}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "status": "ok" }
+## Unconfirming day [/{ctx_token}/weekly_balance/unconfirm/{date}/{register_number}]
+Unconfirm the day in weekly balance. You need to do this if you need to correct numbers for already confirmed day. Please note that a separate permission for unapproving the day is necessary.
 
---
-Budgets
-You can get daily, monthly sales xor salary budgets that are already saved on SameSystem.
-Saving is possible for monthly sales and monthly salary budgets ONLY.
---
++ Parameters
 
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + register_number (required, number) - Number of the register; for details ask your administrator
+
+### Unconfirm the day in weekly balance [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+    }
+
+## Approving week [/{ctx_token}/weekly_balance/approve_week/{date}/{register_number}]
+Approve whole weekly balance report. Confirming for specified week might fail if some days in this week are not confirmed. Exact fail reason will be specified in `description` node.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + register_number (required, number) - Number of the register; for details ask your administrator
+
+### Approve weekly balance [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+    }
+
+## Unapproving week [/{ctx_token}/weekly_balance/unapprove_week/{date}/{register_number}]
+Unapprove whole weekly balance report. Please note that this action requires additional permissions to do that.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + register_number (required, number) - Number of the register; for details ask your administrator
+
+### Unapprove weekly balance [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+    }
+
+# Group Budgets
+You can get daily, monthly sales or salary budgets that are already saved on SameSystem.  Saving is possible for monthly sales and monthly salary budgets **ONLY**.
+
+## Daily sales budgets [/{ctx_token}/budget/daily/{year}/{month}]
+
+### Get daily sales budgets [GET]
 Get daily turnover (sales) budgets. Returns numbers for whole month.
 
-GET /{ctx_token}/budget/daily/{year}/{month}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "daily_budgets": [
-    { "date": "2013-08-01", "amount": 18000.0 },
-    { "date": "2013-08-02", "amount": 17000.50 },
-    { "date": "2013-08-03", "amount": 17000.50 },
-    { "date": "2013-08-04", "amount": 17000.50 },
-    { "date": "2013-08-05", "amount": 17000.50 },
-    { "date": "2013-08-06", "amount": 17000.50 },
-    { "date": "2013-08-07", "amount": 17000.50 },
-    { "date": "2013-08-08", "amount": 17000.50 },
-    { "date": "2013-08-09", "amount": 17000.50 },
-    { "date": "2013-08-10", "amount": 17000.50 },
-    { "date": "2013-08-11", "amount": 17000.50 },
-    { "date": "2013-08-12", "amount": 17000.50 },
-    { "date": "2013-08-13", "amount": 17000.50 },
-    { "date": "2013-08-14", "amount": 17000.50 },
-    { "date": "2013-08-15", "amount": 17000.50 },
-    { "date": "2013-08-16", "amount": 17000.50 },
-    { "date": "2013-08-17", "amount": 17000.50 },
-    { "date": "2013-08-18", "amount": 17000.50 },
-    { "date": "2013-08-19", "amount": 17000.50 },
-    { "date": "2013-08-20", "amount": 17000.50 },
-    { "date": "2013-08-21", "amount": 17000.50 },
-    { "date": "2013-08-22", "amount": 17000.50 },
-    { "date": "2013-08-23", "amount": 17000.50 },
-    { "date": "2013-08-24", "amount": 17000.50 },
-    { "date": "2013-08-25", "amount": 17000.50 },
-    { "date": "2013-08-26", "amount": 17000.50 },
-    { "date": "2013-08-27", "amount": 17000.50 },
-    { "date": "2013-08-28", "amount": 17000.50 },
-    { "date": "2013-08-29", "amount": 17000.50 },
-    { "date": "2013-08-30", "amount": 17000.50 },
-    { "date": "2013-08-31", "amount": 17000.50 }
-    ]
-}
++ Parameters
 
-Save daily turnover (sales) budgets. JSON structure to post is exactly
-the same as you get from the system via GET request.
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
+    + month (required, number) - Format MM - two-digit month
 
-POST /{ctx_token}/budget/daily/{year}/{month}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-{ "daily_budgets": [
-    { "date": "2013-08-01", "amount": 18000.0 },
-    { "date": "2013-08-02", "amount": 17000.50 },
-    { "date": "2013-08-03", "amount": 17000.50 },
-    { "date": "2013-08-04", "amount": 17000.50 },
-    { "date": "2013-08-05", "amount": 17000.50 },
-    { "date": "2013-08-06", "amount": 17000.50 },
-    { "date": "2013-08-07", "amount": 17000.50 },
-    { "date": "2013-08-08", "amount": 17000.50 },
-    { "date": "2013-08-09", "amount": 17000.50 },
-    { "date": "2013-08-10", "amount": 17000.50 },
-    { "date": "2013-08-11", "amount": 17000.50 },
-    { "date": "2013-08-12", "amount": 17000.50 },
-    { "date": "2013-08-13", "amount": 17000.50 },
-    { "date": "2013-08-14", "amount": 17000.50 },
-    { "date": "2013-08-15", "amount": 17000.50 },
-    { "date": "2013-08-16", "amount": 17000.50 },
-    { "date": "2013-08-17", "amount": 17000.50 },
-    { "date": "2013-08-18", "amount": 17000.50 },
-    { "date": "2013-08-19", "amount": 17000.50 },
-    { "date": "2013-08-20", "amount": 17000.50 },
-    { "date": "2013-08-21", "amount": 17000.50 },
-    { "date": "2013-08-22", "amount": 17000.50 },
-    { "date": "2013-08-23", "amount": 17000.50 },
-    { "date": "2013-08-24", "amount": 17000.50 },
-    { "date": "2013-08-25", "amount": 17000.50 },
-    { "date": "2013-08-26", "amount": 17000.50 },
-    { "date": "2013-08-27", "amount": 17000.50 },
-    { "date": "2013-08-28", "amount": 17000.50 },
-    { "date": "2013-08-29", "amount": 17000.50 },
-    { "date": "2013-08-30", "amount": 17000.50 },
-    { "date": "2013-08-31", "amount": 17000.50 }
-    ]
-}
-< 200
-< Content-Type: application/json
-{ "status": "ok", "description": "Daily turnover budgets have been saved." }
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "daily_budgets": [
+            { "date": "2013-08-01", "amount": 18000.0 },
+            { "date": "2013-08-02", "amount": 17000.50 },
+            { "date": "2013-08-03", "amount": 17000.50 },
+            { "date": "2013-08-04", "amount": 17000.50 },
+            { "date": "2013-08-05", "amount": 17000.50 },
+            { "date": "2013-08-06", "amount": 17000.50 },
+            { "date": "2013-08-07", "amount": 17000.50 },
+            { "date": "2013-08-08", "amount": 17000.50 },
+            { "date": "2013-08-09", "amount": 17000.50 },
+            { "date": "2013-08-10", "amount": 17000.50 },
+            { "date": "2013-08-11", "amount": 17000.50 },
+            { "date": "2013-08-12", "amount": 17000.50 },
+            { "date": "2013-08-13", "amount": 17000.50 },
+            { "date": "2013-08-14", "amount": 17000.50 },
+            { "date": "2013-08-15", "amount": 17000.50 },
+            { "date": "2013-08-16", "amount": 17000.50 },
+            { "date": "2013-08-17", "amount": 17000.50 },
+            { "date": "2013-08-18", "amount": 17000.50 },
+            { "date": "2013-08-19", "amount": 17000.50 },
+            { "date": "2013-08-20", "amount": 17000.50 },
+            { "date": "2013-08-21", "amount": 17000.50 },
+            { "date": "2013-08-22", "amount": 17000.50 },
+            { "date": "2013-08-23", "amount": 17000.50 },
+            { "date": "2013-08-24", "amount": 17000.50 },
+            { "date": "2013-08-25", "amount": 17000.50 },
+            { "date": "2013-08-26", "amount": 17000.50 },
+            { "date": "2013-08-27", "amount": 17000.50 },
+            { "date": "2013-08-28", "amount": 17000.50 },
+            { "date": "2013-08-29", "amount": 17000.50 },
+            { "date": "2013-08-30", "amount": 17000.50 },
+            { "date": "2013-08-31", "amount": 17000.50 }
+        ]
+    }
+
+### Save daily sales budgets [POST]
+Save daily turnover (sales) budgets. JSON structure to post is exactly the same as you get from the system via *GET* request.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
+    + month (required, number) - Format MM - two-digit month
+
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+            "daily_budgets": [
+                { "date": "2013-08-01", "amount": 18000.0 },
+                { "date": "2013-08-02", "amount": 17000.50 },
+                { "date": "2013-08-03", "amount": 17000.50 },
+                { "date": "2013-08-04", "amount": 17000.50 },
+                { "date": "2013-08-05", "amount": 17000.50 },
+                { "date": "2013-08-06", "amount": 17000.50 },
+                { "date": "2013-08-07", "amount": 17000.50 },
+                { "date": "2013-08-08", "amount": 17000.50 },
+                { "date": "2013-08-09", "amount": 17000.50 },
+                { "date": "2013-08-10", "amount": 17000.50 },
+                { "date": "2013-08-11", "amount": 17000.50 },
+                { "date": "2013-08-12", "amount": 17000.50 },
+                { "date": "2013-08-13", "amount": 17000.50 },
+                { "date": "2013-08-14", "amount": 17000.50 },
+                { "date": "2013-08-15", "amount": 17000.50 },
+                { "date": "2013-08-16", "amount": 17000.50 },
+                { "date": "2013-08-17", "amount": 17000.50 },
+                { "date": "2013-08-18", "amount": 17000.50 },
+                { "date": "2013-08-19", "amount": 17000.50 },
+                { "date": "2013-08-20", "amount": 17000.50 },
+                { "date": "2013-08-21", "amount": 17000.50 },
+                { "date": "2013-08-22", "amount": 17000.50 },
+                { "date": "2013-08-23", "amount": 17000.50 },
+                { "date": "2013-08-24", "amount": 17000.50 },
+                { "date": "2013-08-25", "amount": 17000.50 },
+                { "date": "2013-08-26", "amount": 17000.50 },
+                { "date": "2013-08-27", "amount": 17000.50 },
+                { "date": "2013-08-28", "amount": 17000.50 },
+                { "date": "2013-08-29", "amount": 17000.50 },
+                { "date": "2013-08-30", "amount": 17000.50 },
+                { "date": "2013-08-31", "amount": 17000.50 }
+            ]
+        }
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+        "description": "Daily turnover budgets have been saved."
+    }
 
 
+## Monthly sales budgets [/{ctx_token}/budget/monthly/{year}]
+
+### Get monthly sales budgets [GET]
 Get monthly sales budget numbers. Returns numbers for whole financial year.
 
-GET /{ctx_token}/budget/monthly/{year}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{"monthly_budgets": [
-  {"year": 2013, "month": 8,  "amount": 558489.0},
-  {"year": 2013, "month": 9,  "amount": 558490.0},
-  {"year": 2013, "month": 10, "amount": 558491.0},
-  {"year": 2013, "month": 11, "amount": 558492.0},
-  {"year": 2013, "month": 12, "amount": 558493.0},
-  {"year": 2014, "month": 1,  "amount": 558494.0},
-  {"year": 2014, "month": 2,  "amount": 558495.0},
-  {"year": 2014, "month": 3,  "amount": 558496.0},
-  {"year": 2014, "month": 4,  "amount": 558497.0},
-  {"year": 2014, "month": 5,  "amount": 558498.0},
-  {"year": 2014, "month": 6,  "amount": 558499.0},
-  {"year": 2014, "month": 7,  "amount": 558500.0}
-]}
++ Parameters
 
-Save monthly sales budgets. JSON structure is exactly the same as you get from the system via GET request.
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
 
-POST /{ctx_token}/budget/monthly/{year}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-{ "monthly_budgets" :  [
-  {"year": 2013, "month": 8,  "amount": 958489.0}, {"year": 2013, "month": 9,  "amount": 958490.0},
-  {"year": 2013, "month": 10, "amount": 958491.0}, {"year": 2013, "month": 11, "amount": 958492.0},
-  {"year": 2013, "month": 12, "amount": 958493.97},{"year": 2014, "month": 1,  "amount": 958494.0},
-  {"year": 2014, "month": 2,  "amount": 958495.0}, {"year": 2014, "month": 3,  "amount": 958496.0},
-  {"year": 2014, "month": 4,  "amount": 958497.0}, {"year": 2014, "month": 5,  "amount": 958498.0},
-  {"year": 2014, "month": 6,  "amount": 958499.0}, {"year": 2014, "month": 7,  "amount": 958500.0}
-]}
-< 200
-< Content-Type: application/json
-{ "status": "ok", "description": "Monthly turnover budgets have been saved." }
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "monthly_budgets": [
+            {"year": 2013, "month": 8,  "amount": 558489.0},
+            {"year": 2013, "month": 9,  "amount": 558490.0},
+            {"year": 2013, "month": 10, "amount": 558491.0},
+            {"year": 2013, "month": 11, "amount": 558492.0},
+            {"year": 2013, "month": 12, "amount": 558493.0},
+            {"year": 2014, "month": 1,  "amount": 558494.0},
+            {"year": 2014, "month": 2,  "amount": 558495.0},
+            {"year": 2014, "month": 3,  "amount": 558496.0},
+            {"year": 2014, "month": 4,  "amount": 558497.0},
+            {"year": 2014, "month": 5,  "amount": 558498.0},
+            {"year": 2014, "month": 6,  "amount": 558499.0},
+            {"year": 2014, "month": 7,  "amount": 558500.0}
+        ]
+    }
+
+### Save monthly sales budgets [POST]
+Save monthly sales budgets. JSON structure is exactly the same as you get from the system via *GET* request.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
+
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+            "monthly_budgets" :  [
+                {"year": 2013, "month": 8,  "amount": 958489.0},
+                {"year": 2013, "month": 9,  "amount": 958490.0},
+                {"year": 2013, "month": 10, "amount": 958491.0},
+                {"year": 2013, "month": 11, "amount": 958492.0},
+                {"year": 2013, "month": 12, "amount": 958493.97},
+                {"year": 2014, "month": 1,  "amount": 958494.0},
+                {"year": 2014, "month": 2,  "amount": 958495.0},
+                {"year": 2014, "month": 3,  "amount": 958496.0},
+                {"year": 2014, "month": 4,  "amount": 958497.0},
+                {"year": 2014, "month": 5,  "amount": 958498.0},
+                {"year": 2014, "month": 6,  "amount": 958499.0},
+                {"year": 2014, "month": 7,  "amount": 958500.0}
+            ]
+        }
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+        "description": "Monthly turnover budgets have been saved."
+    }
 
 
+## Getting daily salary [/{ctx_token}/salary_budget/daily/{year}/{month}]
 Get daily salary budgets. Returns numbers for whole month.
 
-GET /{ctx_token}/salary_budget/daily/{year}/{month}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{ "daily_salary_budgets": [ { "date": "2013-08-01", "amount": 2000.0 },
-{ "date": "2013-08-02", "amount": 3000.0 }, { "and so on for whole calendar month" } ] }
++ Parameters
 
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
+    + month (required, number) - Format MM - two-digit month
+
+### Get daily salary budgets [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "daily_salary_budgets": [
+            { "date": "2013-08-01", "amount": 2000.0 },
+            { "date": "2013-08-02", "amount": 3000.0 },
+            { "and so on for whole calendar month" }
+        ]
+    }
+
+## Monthly salary budgets [/{ctx_token}/salary_budget/monthly/{year}]
+### Get monthly salary budgets [GET]
 Get monthly salary budget numbers. Returns numbers for whole financial year.
 
-GET /{ctx_token}/salary_budget/monthly/{year}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{"monthly_salary_budgets": [
-  {"year": 2013, "month": 8,  "amount": 60000.0},
-  {"year": 2013, "month": 9,  "amount": 60000.0},
-  {"year": 2013, "month": 10, "amount": 60000.0},
-  {"year": 2013, "month": 11, "amount": 60000.0},
-  {"year": 2013, "month": 12, "amount": 60000.0},
-  {"year": 2014, "month": 1,  "amount": 60000.0},
-  {"year": 2014, "month": 2,  "amount": 60000.0},
-  {"year": 2014, "month": 3,  "amount": 60000.0},
-  {"year": 2014, "month": 4,  "amount": 60000.0},
-  {"year": 2014, "month": 5,  "amount": 60000.0},
-  {"year": 2014, "month": 6,  "amount": 60000.0},
-  {"year": 2014, "month": 7,  "amount": 60000.0}
-]}
++ Parameters
 
-Save monthly salary budgets. JSON structure is exactly the same as you get from the system via GET request.
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
 
-POST /{ctx_token}/salary_budget/monthly/{year}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-{ "monthly_salary_budgets" :  [
-  {"year": 2013, "month": 8,  "amount": 3008.0},  {"year": 2013, "month": 9,  "amount": 3000.0},
-  {"year": 2013, "month": 10, "amount": 3010.0},  {"year": 2013, "month": 11, "amount": 3000.0},
-  {"year": 2013, "month": 12, "amount": 3012.0},  {"year": 2014, "month": 1,  "amount": 4001.0},
-  {"year": 2014, "month": 2,  "amount": 3000.0},  {"year": 2014, "month": 3,  "amount": 3000.0},
-  {"year": 2014, "month": 4,  "amount": 4004.0},  {"year": 2014, "month": 5,  "amount": 3000.0},
-  {"year": 2014, "month": 6,  "amount": 3000.0},  {"year": 2014, "month": 7,  "amount": 4007.0}
-]}
-< 200
-< Content-Type: application/json
-{ "status": "ok", "description": "Monthly salary budgets have been saved." }
++ Request
+    + Headers
 
---
-Users
-You can get information about user creation or update in the system.
-With some exceptions, it is possible to edit any information about the user via POST request.
-Fields are customizable via "User changes export settings" in SameSystem -
-only fields in "Exported columns" list will be in API response. Below is only one of the
-possible examples
---
-Get all current users for the in the ctx_token specified department.
-GET /{ctx_token}/users
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{"users": [
-  {
-      "user_id": 50236, "wage_earner_no": "000258", "role": "Elev",
-      "civil_no": "123456-1234", "first_name": "John", "last_name": "Doe",
-      "address_line1": "Oxford str. 5C", "postal_code": "05251", "city": "London",
-      "mobile": "450254826", "email": "john.doe@mail.dk", "salary_dpt_no": "15",
-      "start_date": "2014-01-01", "employee_type": "Fulltime"
-  },
-  {
-      "user_id": 50237, "wage_earner_no": "000259", "role": "Butikchef",
-      "civil_no": "123457-1234", "first_name": "Adriana", "last_name": "Laursen",
-      "address_line1": "Oxford str. 5D", "postal_code": "05251", "city": "London",
-      "mobile": "450254827", "email": "adriana@mail.dk", "salary_dpt_no": "15",
-      "start_date": "2014-01-01", "employee_type": "Hourly"
-  }
-]}
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
 
-Get exact user by samesystem user id.
++ Response 200 (application/json)
 
-GET /{ctx_token}/users/{user_id}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{
-    "user_id": 50236, "wage_earner_no": "000258", "role": "Elev",
-    "civil_no": "123456-1234", "first_name": "John", "last_name": "Doe",
-    "address_line1": "Oxford str. 5C", "postal_code": "05251", "city": "London",
-    "mobile": "450254826", "email": "john.doe@mail.dk", "salary_dpt_no": "15",
-    "start_date": "2014-01-01", "employee_type": "Fulltime"
-}
+    {
+        "monthly_salary_budgets": [
+            {"year": 2013, "month": 8,  "amount": 60000.0},
+            {"year": 2013, "month": 9,  "amount": 60000.0},
+            {"year": 2013, "month": 10, "amount": 60000.0},
+            {"year": 2013, "month": 11, "amount": 60000.0},
+            {"year": 2013, "month": 12, "amount": 60000.0},
+            {"year": 2014, "month": 1,  "amount": 60000.0},
+            {"year": 2014, "month": 2,  "amount": 60000.0},
+            {"year": 2014, "month": 3,  "amount": 60000.0},
+            {"year": 2014, "month": 4,  "amount": 60000.0},
+            {"year": 2014, "month": 5,  "amount": 60000.0},
+            {"year": 2014, "month": 6,  "amount": 60000.0},
+            {"year": 2014, "month": 7,  "amount": 60000.0}
+        ]
+    }
+
+### Save monthly salary budgets [POST]
+Save monthly salary budgets. JSON structure is exactly the same as you get from the system via *GET* request.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + year (required, number) - Format YYYY - four-digit year
+
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+    + Body
+
+        {
+            "monthly_salary_budgets" :  [
+                {"year": 2013, "month": 8,  "amount": 3008.0},
+                {"year": 2013, "month": 9,  "amount": 3000.0},
+                {"year": 2013, "month": 10, "amount": 3010.0},
+                {"year": 2013, "month": 11, "amount": 3000.0},
+                {"year": 2013, "month": 12, "amount": 3012.0},
+                {"year": 2014, "month": 1,  "amount": 4001.0},
+                {"year": 2014, "month": 2,  "amount": 3000.0},
+                {"year": 2014, "month": 3,  "amount": 3000.0},
+                {"year": 2014, "month": 4,  "amount": 4004.0},
+                {"year": 2014, "month": 5,  "amount": 3000.0},
+                {"year": 2014, "month": 6,  "amount": 3000.0},
+                {"year": 2014, "month": 7,  "amount": 4007.0}
+            ]
+        }
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+        "description": "Monthly salary budgets have been saved."
+    }
+
+# Group Users
+You can get information about user creation or update in the system. With some exceptions, it is possible to edit any information about the user via POST request. Fields are customizable via "User changes export settings" in SameSystem - only fields in "Exported columns" list will be in API response. Below is only one of the possible examples.
+
+## Getting users [/{ctx_token}/users]
+Get all current users for the in the `ctx_token` specified department.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Get users for department [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "users": [
+            {
+                "user_id": 50236,
+                "wage_earner_no": "000258",
+                "role": "Elev",
+                "civil_no": "123456-1234",
+                "first_name": "John",
+                "last_name": "Doe",
+                "address_line1": "Oxford str. 5C",
+                "postal_code": "05251",
+                "city": "London",
+                "mobile": "450254826",
+                "email": "john.doe@mail.dk",
+                "salary_dpt_no": "15",
+                "start_date": "2014-01-01",
+                "employee_type": "Fulltime"
+            },
+            {
+                "user_id": 50237,
+                "wage_earner_no": "000259",
+                "role": "Butikchef",
+                "civil_no": "123457-1234",
+                "first_name": "Adriana",
+                "last_name": "Laursen",
+                "address_line1": "Oxford str. 5D",
+                "postal_code": "05251",
+                "city": "London",
+                "mobile": "450254827",
+                "email": "adriana@mail.dk",
+                "salary_dpt_no": "15",
+                "start_date": "2014-01-01",
+                "employee_type": "Hourly"
+            }
+        ]
+    }
+
+## Showing user [/{ctx_token}/users/{user_id}]
+Get exact user by SameSystem user's id.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + user_id (required, number) - ID of the user from SameSystem
+
+### Show user's details [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "user_id": 50236,
+        "wage_earner_no": "000258",
+        "role": "Elev",
+        "civil_no": "123456-1234",
+        "first_name": "John",
+        "last_name": "Doe",
+        "address_line1": "Oxford str. 5C",
+        "postal_code": "05251",
+        "city": "London",
+        "mobile": "450254826",
+        "email": "john.doe@mail.dk",
+        "salary_dpt_no": "15",
+        "start_date": "2014-01-01",
+        "employee_type": "Fulltime"
+    }
 
 
-Update users' information on the system. Update only specified fields from the date of "change_date".
-If another change on that date exists, it will patch with the information specified.
-Specify extra fields in the same way as SameSystem returns for information retrieval above.
+## Updating user [/{ctx_token}/users/update/{user_id}]
+Update users' information on the system. Update only specified fields from the date of "change_date". If another change on that date exists, it will patch with the information specified. Specify extra fields in the same way as SameSystem returns for information retrieval above.
 
-POST /{ctx_token}/users/update/{user_id}
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-{
-    "change_date": "2014-02-28", "wage_earner_no": "111258", "kon_704": "1"
-}
-< 200
-< Content-Type: application/json
-{ "status": "ok", "description": "User #50236 has been sucessfully updated." }
++ Parameters
 
-Create user on SameSystem. You can send the same attributes as you get in created/updated
-response. However, first & last name, payroll number, start date, role, civil number,
-shop name, hours week are mandatory to provide.
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + user_id (required, number) - ID of the user from SameSystem
 
-In case some requirements are failed to be fullfilled, you will get response with descriptive
-error message and "errors" node which explains which fields were problematic.
+### Update the user [POST]
++ Request
+    + Headers
 
-If user creation was successful you will receive 'password' node with new user password
-and 'user_id' node with created user id from SameSystem.
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
 
-POST /{ctx_token}/users/create
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-{
-    "role": "Fulltime",
-    "civil_no": "010387-2222",
-    "first_name": "Jonas",
-    "last_name": "Jonka",
-    "address_line1": "Kooperatyvinis butas Kalvarijų g.",
-    "postal_code": "LT-2000",
-    "city": "Vilnius",
-    "mobile": "112113",
-    "email": "jonas@inside.dk",
-    "kon_1": "Pige",
-    "start_date": "2010-08-16",
-    "shop_name": "Shoes",
-    "hours_week": 37.0
-}
-< 200
-< Content-Type: application/json
-{
-    "status": "ok",
-    "message": "User has been successfully created",
-    "user_id": 10053,
-    "password": "123abc"
-}
+    + Body
 
-Get all CREATED users after specified date. Created users are returned from all departments.
-Date is inclusive and starts from 00:00 time in CET time zone, unless optional {time} parameter
-is passed (format: HH:MM, for example 14:30)
-For example, if passed date is 2014-02-28, all users updated after
-2014-02-28 00:00 CET will be returned. If there're custom fields in
-export settings defined, then JSON key will be transliterated and downcased
-field name with id in the end, for example "Køn" => "kon_704".
+        {
+            "change_date": "2014-02-28",
+            "wage_earner_no": "111258",
+            "kon_704": "1"
+        }
 
-GET /{ctx_token}/users/created/{date}(/{time})
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{"users": [
-  {
-      "user_id": 50236, "wage_earner_no": "000258", "role": "Elev",
-      "civil_no": "123456-1234", "first_name": "John", "last_name": "Doe",
-      "address_line1": "Oxford str. 5C", "postal_code": "05251", "city": "London",
-      "mobile": "450254826", "email": "john.doe@mail.dk", "salary_dpt_no": "15",
-      "start_date": "2014-01-01", "employee_type": "Fulltime"
-  },
-  {
-      "user_id": 50237, "wage_earner_no": "000259", "role": "Butikchef",
-      "civil_no": "123457-1234", "first_name": "Adriana", "last_name": "Laursen",
-      "address_line1": "Oxford str. 5D", "postal_code": "05251", "city": "London",
-      "mobile": "450254827", "email": "adriana@mail.dk", "salary_dpt_no": "15",
-      "start_date": "2014-01-01", "employee_type": "Hourly"
-  }
-]}
++ Response 200 (application/json)
 
-Get all UPDATED users after specified date. Updated users are returned from all departments with updated fields keys under "changed" node.
-Date is inclusive and starts from 00:00 time in CET time zone, unless optional {time} parameter
-is passed (format: HH:MM, for example 14:30)
-For example, if passed date is 2014-02-28, all users updated after
-2014-02-28 00:00 CET will be returned. If there're custom fields in
-export settings defined, then JSON key will be transliterated and downcased
-field name with id in the end, for example "Køn" => "kon_704".
+    {
+        "status": "ok",
+        "description": "User #50236 has been sucessfully updated."
+    }
 
-GET /{ctx_token}/users/updated/{date}(/{time})
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-< 200
-< Content-Type: application/json
-{"users": [
-  {
-      "user_id": 50236, "change_date": "2014-02-28", "wage_earner_no": "000258", "role": "Elev",
-      "civil_no": "123456-1234", "first_name": "John", "last_name": "Doe",
-      "address_line1": "Oxford str. 5C", "postal_code": "05251", "city": "London",
-      "mobile": "450254826", "email": "john.doe@mail.dk", "salary_dpt_no": "15",
-      "changed": ["wage_earner_no", "salary_dpt_no"],
-      "start_date": "2014-01-01", "employee_type": "Fulltime"
-  },
-  {
-      "user_id": 50237, "change_date": "2014-06-01", "wage_earner_no": "000259", "role": "Butikchef",
-      "civil_no": "123457-1234", "first_name": "Adriana", "last_name": "Laursen",
-      "address_line1": "Oxford str. 5D", "postal_code": "05251", "city": "London",
-      "mobile": "450254827", "email": "adriana@mail.dk", "salary_dpt_no": "15",
-      "changed": ["wage_earner_no"],
-      "start_date": "2014-01-01", "employee_type": "Hourly"
-  }
-]}
+## Creating user [/{ctx_token}/users/create]
+Create user on SameSystem. You can send the same attributes as you get in created/updated response. However, first & last name, payroll number, start date, role, civil number, shop name, hours week are mandatory to provide.
 
---
-Fingerprint
+In case some requirements are failed to be fullfilled, you will get response with descriptive error message and "errors" node which explains which fields were problematic.
+
+If user creation was successful you will receive 'password' node with new user password and 'user_id' node with created user's id from SameSystem.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Create user [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+            "role": "Fulltime",
+            "civil_no": "010387-2222",
+            "first_name": "Jonas",
+            "last_name": "Jonka",
+            "address_line1": "Kooperatyvinis butas Kalvarijų g.",
+            "postal_code": "LT-2000",
+            "city": "Vilnius",
+            "mobile": "112113",
+            "email": "jonas@inside.dk",
+            "kon_1": "Pige",
+            "start_date": "2010-08-16",
+            "shop_name": "Shoes",
+            "hours_week": 37.0
+        }
+
++ Response 200 (application/json)
+
+    {
+        "status": "ok",
+        "message": "User has been successfully created",
+        "user_id": 10053,
+        "password": "123abc"
+    }
+
+## Getting CREATED users [/{ctx_token}/users/created/{date}/{time}]
+Get all CREATED users after specified date. Created users are returned from all departments.  Date is inclusive and starts from 00:00 time in CET time zone, unless optional {time} parameter is passed (format: HH:MM, for example 14:30)
+
+For example, if passed date is 2014-02-28, all users updated after 2014-02-28 00:00 CET will be returned. If there're custom fields in export settings defined, then JSON key will be transliterated and downcased field name with id in the end, for example "Køn" => "kon_704".
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + time (optional, string) - For details refer to the section "Important notes"
+
+### Get CREATED users for department [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "users": [
+            {
+                "user_id": 50236,
+                "wage_earner_no": "000258",
+                "role": "Elev",
+                "civil_no": "123456-1234",
+                "first_name": "John",
+                "last_name": "Doe",
+                "address_line1": "Oxford str. 5C",
+                "postal_code": "05251",
+                "city": "London",
+                "mobile": "450254826",
+                "email": "john.doe@mail.dk",
+                "salary_dpt_no": "15",
+                "start_date": "2014-01-01",
+                "employee_type": "Fulltime"
+            },
+            {
+                "user_id": 50237,
+                "wage_earner_no": "000259",
+                "role": "Butikchef",
+                "civil_no": "123457-1234",
+                "first_name": "Adriana",
+                "last_name": "Laursen",
+                "address_line1": "Oxford str. 5D",
+                "postal_code": "05251",
+                "city": "London",
+                "mobile": "450254827",
+                "email": "adriana@mail.dk",
+                "salary_dpt_no": "15",
+                "start_date": "2014-01-01",
+                "employee_type": "Hourly"
+            }
+        ]
+    }
+
+## Getting UPDATED users [/{ctx_token}/users/updated/{date}/{time}]
+Get all UPDATED users after specified date. Updated users are returned from all departments with updated fields keys under "changed" node.  Date is inclusive and starts from 00:00 time in CET time zone, unless optional {time} parameter is passed (format: HH:MM, for example 14:30).
+
+For example, if passed date is 2014-02-28, all users updated after 2014-02-28 00:00 CET will be returned. If there're custom fields in export settings defined, then JSON key will be transliterated and downcased field name with id in the end, for example "Køn" => "kon_704".
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+    + date (required, string) - For details refer to the section "Important notes"
+    + time (optional, string) - For details refer to the section "Important notes"
+
+### Get UPDATED users for department [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
++ Response 200 (application/json)
+
+    {
+        "users": [
+            {
+                "user_id": 50236,
+                "change_date": "2014-02-28",
+                "wage_earner_no": "000258",
+                "role": "Elev",
+                "civil_no": "123456-1234",
+                "first_name": "John",
+                "last_name": "Doe",
+                "address_line1": "Oxford str. 5C",
+                "postal_code": "05251",
+                "city": "London",
+                "mobile": "450254826",
+                "email": "john.doe@mail.dk",
+                "salary_dpt_no": "15",
+                "changed": ["wage_earner_no", "salary_dpt_no"],
+                "start_date": "2014-01-01",
+                "employee_type": "Fulltime"
+            },
+            {
+                "user_id": 50237,
+                "change_date": "2014-06-01",
+                "wage_earner_no": "000259",
+                "role": "Butikchef",
+                "civil_no": "123457-1234",
+                "first_name": "Adriana",
+                "last_name": "Laursen",
+                "address_line1": "Oxford str. 5D",
+                "postal_code": "05251",
+                "city": "London",
+                "mobile": "450254827",
+                "email": "adriana@mail.dk",
+                "salary_dpt_no": "15",
+                "changed": ["wage_earner_no"],
+                "start_date": "2014-01-01",
+                "employee_type": "Hourly"
+            }
+        ]
+    }
+
+# Group Fingerprint
 Very basic time registration through API. Returns a registered start time, end time or an error. Type of registered time is determined automatically.
---
 
 Register start or end time by providing:
 
@@ -735,44 +1047,52 @@ Register start or end time by providing:
 
 Successful response (code 201) structure:
 
-* message - end-user friendly message in English, e.g.: _Start/End time registered N minutes early/late/on time_.
-* planned - local planned time, e.g. _09:00_
-* registered - local registered time, e.g. _09:15_
-* type - _Start time_ or _End time_
+* message - end-user friendly message in English, e.g.: *Start/End time registered N minutes early/late/on time*.
+* planned - local planned time, e.g. *09:00*
+* registered - local registered time, e.g. *09:15*
+* type - *Start time* or *End time*
 
 Unsuccessful response structure:
 
-* status - _fail_
-* message - _Fingerprint data rejected because of incorrect data passed. Please check errors for more details_
+* status - *fail*
+* message - *Fingerprint data rejected because of incorrect data passed. Please check errors for more details*
 * errors - Array of possible error messages:
-  * _Invalid email_
-  * _Provided fingerprint timestamp is in future, time travel has not been invented yet_
-  * _Invalid fingerprint timestamp_
-  * _Provided sent timestamp is in future, time travel has not been invented yet_
-  * _Invalid sent timestamp_
-  * _Department not found_
-  * _Department belongs to another client_
-  * _Email belongs to employee of a different client_
-  * _Missing email_
-  * _Missing fingerprint timestamp_
-  * _Missing sent timestamp_
-  * _Missing department id_
-  * _Employee {full_name} has no planned worktime in {shop_name} on {date}_
-  * _Employee {full_name} cannot register in {shop_name} on {date}_
-POST /fingerprint/create
-> AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-> Content-Type: application/json
-{
-    "email": "employee_email@inside.dk",
-    "fingerprint_utc": "1422864000",
-    "sent_utc": "1422864060",
-    "shop_id": "10"
-}
-< 200
-< Content-Type: application/json
-{
-    "message": "Start time registered as planned",
-    "planned": "09:00",
-    "registered": "09:00",
-    "type": "Start time"
-}
+  * *Invalid email*
+  * *Provided fingerprint timestamp is in future, time travel has not been invented yet*
+  * *Invalid fingerprint timestamp*
+  * *Provided sent timestamp is in future, time travel has not been invented yet*
+  * *Invalid sent timestamp*
+  * *Department not found*
+  * *Department belongs to another client*
+  * *Email belongs to employee of a different client*
+  * *Missing email*
+  * *Missing fingerprint timestamp*
+  * *Missing sent timestamp*
+  * *Missing department id*
+  * *Employee {full_name} has no planned worktime in {shop_name} on {date}*
+  * *Employee {full_name} cannot register in {shop_name} on {date}*
+
+## Creating starting time [/fingerprint/create]
+### Create start time by fingerprint [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+            "email": "employee_email@inside.dk",
+            "fingerprint_utc": "1422864000",
+            "sent_utc": "1422864060",
+            "shop_id": "10"
+        }
++ Response 201 (application/json)
+
+    {
+        "message": "Start time registered as planned",
+        "planned": "09:00",
+        "registered": "09:00",
+        "type": "Start time"
+    }
