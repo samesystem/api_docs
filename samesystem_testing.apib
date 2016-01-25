@@ -1096,3 +1096,32 @@ Unsuccessful response structure:
         "registered": "09:00",
         "type": "Start time"
     }
+
+#Group Users csv Upload
+## Upload csv file [/{ctx_token}/users/upload]
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Upload users csv file [POST]
++ Request
+    + Headers
+
+          AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+          Content-type: multipart/form-data; boundary=---abc123
+
+    + Body
+
+          ---abc123
+          Content-Disposition: form-data; name="users"; filename="users.csv"
+          Content-Type: text/csv
+
+          user_id;email
+          1;demo@example.com
+          ---abc123--
+
++ Response 201 (application/json)
+
+    {
+            "status": "ok"
+    }
