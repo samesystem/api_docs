@@ -1104,21 +1104,23 @@ Unsuccessful response structure:
     + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
 
 ### Upload users csv file [POST]
-+ Request
++ Request (multipart/form-data, boundary=AaB03x)
+
     + Headers
 
-          AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
-          Content-type: multipart/form-data; boundary=---abc123
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
 
     + Body
 
-          ---abc123
-          Content-Disposition: form-data; name="users"; filename="users.csv"
-          Content-Type: text/csv
+            --AaB03x
+            content-disposition: form-data; name="csv_file"; filename="users.csv"
+            Content-Type: text/csv
+            Content-Transfer-Encoding: binary
 
-          user_id;email
-          1;demo@example.com
-          ---abc123--
+            \xED\xE5\xF0
+            \x0FYe\xC0
+            \xCF\x16\\
+            --AaB03x--
 
 + Response 201 (application/json)
 
