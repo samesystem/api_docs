@@ -1096,3 +1096,132 @@ Unsuccessful response structure:
     }
 
 # Group Exports
+## Salary export [/{ctx_token}/export/salary]
+Body contain one object with `set` node, which has following attributes:
++ set
+  + start: '2016-08-01' [string, required] - Salary export starting date**
+  + end: '2016-08-31' [string, required] - Salary export ending date**
+  + worktime: '1' [string, required]
+  + bonuses: '1' [string, required]
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Retrieve salary export data [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+          "set": {
+            "start": "2016-01-01",
+            "end": "2016-01-31",
+            "worktime": "1",
+            "bonuses": "1"
+          }
+        }
++ Response 200 (application/json)
+
+    [
+      { "user": "160" }
+    ]
+
+## User balances export [/{ctx_token}/export/users_balances]
+Body contain one object with `filter` node, which has following attributes:
++ filter
+  + date: '2016-08-01' [string, required] - Users balances date* /*
+  + shops: ['1'] [array of strings]
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Retrieve users balances data [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+          "filter": {
+            "date": "2016-01-01",
+            "shops": ['1']
+          }
+        }
++ Response 200 (application/json)
+
+    [
+      { "user": "160" }
+    ]
+
+## Users details export [/{ctx_token}/export/users_details]
+Body contain one object with `settings` node, which has following attributes:
++ settings
+  + start: '2016-08-01' [string, required] - Salary export starting date**
+  + end: '2016-08-31' [string, required] - Salary export ending date**
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Retrieve users details data [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+          "settings": {
+            "start": "2016-01-01",
+            "end": "2016-01-31",
+          }
+        }
++ Response 200 (application/json)
+
+    [
+      { "user": "160" }
+    ]
+
+## Vacation export [/{ctx_token}/export/vacation]
+Body contain one object with `filter` node, which has following attributes:
++ filter
+  + date: '2016-08-01' [string, required] - Vacation's date* /*
+  + shops: ['1'] [array of strings]
+  + absence_type_id: '1' [string, required]
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Retrieve vacation data [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+          "filter": {
+            "date": "2016-01-01",
+            "shops": ['1'],
+            "absence_type_id": "1",
+          }
+        }
++ Response 200 (application/json)
+
+    [
+      { "user": "160" }
+    ]
