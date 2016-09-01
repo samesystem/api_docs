@@ -1129,6 +1129,45 @@ Unsuccessful response structure:
     }
 
 # Group Exports
+## Worktime export [/{ctx_token}/export/worktime]
+Body contain one object with `set` node, which has following attributes:
++ options
+  + shops: ['1'] - [array, required]  - Shop ids list**
+  + start_date: '2016-08-01' [string, required] - Worktime export starting date**
+  + end_date: '2016-08-31' [string, required] - Worktime export ending date**
+  + roles: ['1'] [array, optional] - Role ids list
+  + only_absences: '1' [string, optional] - Export only absences pass '1'
+  + with_unreleased: '1' [string, optional] - Export with unreleases hours as well
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Retrieve salary export data [GET]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+        {
+          "options": {
+            "shops": ["11"]
+            "start_date": "2016-01-01",
+            "end_date": "2016-01-31"
+          }
+        }
++ Response 200 (application/json)
+
+    [
+      ["", "0001", nil, "2016-01-01", "9.50", "08:00", "18:00", "John Doe", "237.01", nil, "00:30", "", 570, 0, "Administrator", "NR", nil, nil],
+      ["", "0001", nil, "2016-01-02", "9.50", "08:00", "18:00", "John Doe", "237.01", nil, "00:30", "", 570, 0, "Administrator", "NR", nil, nil],
+      [nil, "0001", nil, "2016-01-03", "9.50", "08:00", "18:00", "John Doe", "237.01", nil, "00:30", "", 570, 0, "Administrator", "NR", nil, nil]
+    ]
+
+
 ## Salary export [/{ctx_token}/export/salary]
 Body contain one object with `set` node, which has following attributes:
 + set
