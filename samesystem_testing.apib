@@ -1132,9 +1132,9 @@ Unsuccessful response structure:
 ## Worktime export [/{ctx_token}/export/worktime]
 Body contain one object with `options` node, which has following attributes:
 + options
-  + shops: ['1'] - [array, required]  - Shop ids list**
-  + start_date: '2016-08-01' [string, required] - Worktime export starting date**
-  + end_date: '2016-08-31' [string, required] - Worktime export ending date**
+  + shops: ['1'] - [array, required]  - Shop ids list
+  + start_date: '2016-08-01' [string, required] - Worktime export starting date
+  + end_date: '2016-08-31' [string, required] - Worktime export ending date
   + roles: ['1'] [array, optional] - Role ids list
   + only_absences: '1' [string, optional] - Export only absences pass '1'
   + with_unreleased: '1' [string, optional] - Export with unreleases hours as well
@@ -1143,7 +1143,7 @@ Body contain one object with `options` node, which has following attributes:
 
     + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
 
-### Retrieve salary export data [GET]
+### Retrieve worktime export data [GET]
 + Request
     + Headers
 
@@ -1171,8 +1171,8 @@ Body contain one object with `options` node, which has following attributes:
 ## Salary export [/{ctx_token}/export/salary]
 Body contain one object with `set` node, which has following attributes:
 + set
-  + start: '2016-08-01' [string, required] - Salary export starting date**
-  + end: '2016-08-31' [string, required] - Salary export ending date**
+  + start: '2016-08-01' [string, required] - Salary export starting date
+  + end: '2016-08-31' [string, required] - Salary export ending date
   + worktime: '1' [string, required]
   + bonuses: '1' [string, required]
 
@@ -1206,7 +1206,7 @@ Body contain one object with `set` node, which has following attributes:
 ## User balances export [/{ctx_token}/export/users_balances]
 Body contain one object with `filter` node, which has following attributes:
 + filter
-  + date: '2016-08-01' [string, required] - Users balances date* /*
+  + date: '2016-08-01' [string, required] - Users balances date
   + shops: ['1'] [array of strings]
 
 + Parameters
@@ -1237,8 +1237,8 @@ Body contain one object with `filter` node, which has following attributes:
 ## Users details export [/{ctx_token}/export/users_details]
 Body contain one object with `settings` node, which has following attributes:
 + settings
-  + start: '2016-08-01' [string, required] - Salary export starting date**
-  + end: '2016-08-31' [string, required] - Salary export ending date**
+  + start: '2016-08-01' [string, required] - Salary export starting date
+  + end: '2016-08-31' [string, required] - Salary export ending date
 
 + Parameters
 
@@ -1268,7 +1268,7 @@ Body contain one object with `settings` node, which has following attributes:
 ## Vacation export [/{ctx_token}/export/vacation]
 Body contain one object with `filter` node, which has following attributes:
 + filter
-  + date: '2016-08-01' [string, required] - Vacation's date* /*
+  + date: '2016-08-01' [string, required] - Vacation's date
   + shops: ['1'] [array of strings]
   + absence_type_id: '1' [string, required]
 
