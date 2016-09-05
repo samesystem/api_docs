@@ -457,6 +457,97 @@ Unapprove whole weekly balance report. Please note that this action requires add
         "status": "ok",
     }
 
+# Group Personal Turnover
+Turonver is used for meassurement of performance on the employees.
+In order to find a user on SameSystem, one of the attributes must be sent with each request:
+
+| Attribute | Type |Explanation |
+|-----------|-------------|-------------|
+| user_id | number |User's Id on SameSystem
+| salesman_number | string | If client has enabled option to have salesman_numbers for users
+
+## Create Turnover record [/{ctx_token}/turnover/create]
+Successful responses are sent without body, only with HTTP Status code 201.
+If errors occur, responses are sent as json with 'errors' node in response payload.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Create turnover record reqeust [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+            {
+              "user_id": 1,
+              "dpt_no": "11",
+              "date": "2016-09-01",
+              "amount": 100.01
+            }
++ Response 201 (application/json)
+
+## Update Turnover record [/{ctx_token}/turnover/update]
+Successful responses are sent without body, only with HTTP Status code 200.
+If errors occur, responses are sent as json with 'errors' node in response payload.
+
+If you want to sum up, then you can send 'add_to_existing' node:
+
+| Attribute | Type |Explanation |
+|-----------|-------------|-------------|
+| add_to_existing | boolean | `true` as a value, if addition for existing record is needed. `amount` with negative values will be deducted in this case.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Update turnover record reqeust [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+            {
+              "user_id": 1,
+              "dpt_no": "11",
+              "date": "2016-09-01",
+              "add_to_existing": true,
+              "amount": 100.01
+            }
++ Response 200 (application/json)
+
+## Delete Turnover record [/{ctx_token}/turnover/delete]
+Successful responses are sent without body, only with HTTP Status code 200.
+If errors occur, responses are sent as json with 'errors' node in response payload.
+
++ Parameters
+
+    + ctx_token (required, string) - For details refer to the section "What is ctx token and how to use it"
+
+### Delete turnover record reqeust [POST]
++ Request
+    + Headers
+
+            AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
+            Content-Type: 'application/json'
+
+    + Body
+
+            {
+              "user_id": 1,
+              "dpt_no": "11",
+              "date": "2016-09-01"
+            }
++ Response 200 (application/json)
+
+
 # Group Budgets
 You can get daily, monthly sales or salary budgets that are already saved on SameSystem.  Saving is possible for monthly sales and monthly salary budgets **ONLY**.
 
