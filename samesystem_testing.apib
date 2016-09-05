@@ -459,12 +459,21 @@ Unapprove whole weekly balance report. Please note that this action requires add
 
 # Group Personal Turnover
 Turonver is used for meassurement of performance on the employees.
+
 In order to find a user on SameSystem, one of the attributes must be sent with each request:
+
+| Attribute | Type | Explanation |
+|-----------|-------------|-------------|
+| user_id | number | User's Id on SameSystem
+| salesman_number | string | If client has enabled option to have salesman_numbers for users
+
+In order to find a department on SameSystem, one of the attributes must be sent with each request:
 
 | Attribute | Type |Explanation |
 |-----------|-------------|-------------|
-| user_id | number |User's Id on SameSystem
-| salesman_number | string | If client has enabled option to have salesman_numbers for users
+| shop_id | number | Department's Id on SameSystem
+| shop_name | string | Department's name on SameSystem
+| dpt_no | string | Department's number (`Dpt. no.`) on SameSystem
 
 ## Create Turnover record [/{ctx_token}/turnover/create]
 Successful responses are sent without body, only with HTTP Status code 201.
@@ -495,7 +504,7 @@ If errors occur, responses are sent as json with 'errors' node in response paylo
 Successful responses are sent without body, only with HTTP Status code 200.
 If errors occur, responses are sent as json with 'errors' node in response payload.
 
-If you want to sum up, then you can send 'add_to_existing' node:
+If you want to sum up amount, then you can send 'add_to_existing' node:
 
 | Attribute | Type |Explanation |
 |-----------|-------------|-------------|
