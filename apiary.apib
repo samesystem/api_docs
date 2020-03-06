@@ -1,7 +1,7 @@
 FORMAT: 1A
 HOST: https://testapi.samesystem.com/api/v1
 
-# SameSystem API v1
+# SameSystem API v1 (test)
 
 Welcome to SameSystem public API documentation.
 
@@ -9,7 +9,7 @@ In case of any questions, please feel free to contact <api@samesystem.com>
 
 **Important notes**
 
-* All communications are available through JSON, so please pass the correct content-type header or append .json to each URL to API call. 
+* All communications are available through JSON, so please pass the correct content-type header or append .json to each URL to API call.
 * All numbers are passed and returned in floating point number format "%g", for example 123.12. Localized number formatting is not allowed!
 * All dates are passed and returned in international date format: YYYY-MM-DD, for example 2013-12-01.
 * In request URL always reference correct ctx_token where needed.
@@ -22,7 +22,7 @@ In case of any questions, please feel free to contact <api@samesystem.com>
 
 **Request status**
 
-* Each time request is made, API always respons with exact content or `status` node. If `status` contents equals to `fail`, then `description` node is specified also. 
+* Each time request is made, API always respons with exact content or `status` node. If `status` contents equals to `fail`, then `description` node is specified also.
 
 **Permissions**
 
@@ -40,16 +40,16 @@ given tasks, because API permissions works exactly the same as permissions in we
 
 ## Login [/login]
 
-Login to get token for API authentication. Received token should be encoded to HTTP_AUTHORIZATION header as token for all further API requests. 
+Login to get token for API authentication. Received token should be encoded to HTTP_AUTHORIZATION header as token for all further API requests.
 **Token is valid for 10 minutes.** After this amount of time, please re-login to gain new token.
 
 ### Login to the system [POST]
 + Request
     + Headers
-        
+
             Content-Type: 'application/json'
     + Body
-        
+
             {
                 "email": "john.doe@mail.dk",
                 "password": "apitestingpwd"
@@ -68,11 +68,11 @@ Logout to invalidate your token. This action must be called after all calls to A
 ### Logout [POST]
 + Request
     + Headers
-        
+
             AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
             Content-Type: 'application/json'
     + Body
-        
+
             {}
 + Response 200 (application/json)
 
@@ -91,7 +91,7 @@ Perform a GET request to get full list of available departments for your account
 ### Get list of departments [GET]
 + Request
     + Headers
-    
+
             AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
             Content-Type: 'application/json'
 + Response 200 (application/json)
@@ -102,22 +102,22 @@ Perform a GET request to get full list of available departments for your account
                 { "name": "T-Shirts", "ctx_token": "c1205d6595", "dpt_no": null }
             ]
         }
-        
+
 ## Create department [/departments/create]
-    
+
 Create a department on SameSystem. You can send the attributes that are exposed here in the example below. Choose appropriate programing language from menu "Show code sample" to see details.
 'name' and 'email' nodes are must be set. For manager email use 'manager_email' node. If you don't provide manager's email, then manager's email will be set for the user which is used for this API call.
 
 ### Create a new department [POST]
 + Request
     + Headers
-        
+
             AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
             Content-Type: 'application/json'
     + Body
-        
+
             {
-                "name": "Your Shop", 
+                "name": "Your Shop",
                 "email": "shops_email@inside.dk",
                 "manager_email": "manager_email@inside.dk",
                 "phone": "0123345667",
@@ -135,7 +135,7 @@ Create a department on SameSystem. You can send the attributes that are exposed 
 + Response 200 (application/json)
 
         {
-            "status": "ok", 
+            "status": "ok",
             "description": "Department has been successfully created",
             "department_id": 100
         }
@@ -154,13 +154,13 @@ For manager's email use 'manager_email' node.
 ### Update a department [POST]
 + Request
     + Headers
-        
+
             AUTHORIZATION: Token token="7NV1ycL2DxSXjH9OEvRlxg"
             Content-Type: 'application/json'
     + Body
-        
+
             {
-                "name": "Your updated Shop", 
+                "name": "Your updated Shop",
                 "email": "shops_email@inside.dk",
                 "manager_email": "manager_email@inside.dk",
                 "phone": "0123345667",
@@ -178,7 +178,7 @@ For manager's email use 'manager_email' node.
 + Response 200 (application/json)
 
         {
-            "status": "ok", 
+            "status": "ok",
             "description": "Shop #11 has been successfully updated"
         }
 
